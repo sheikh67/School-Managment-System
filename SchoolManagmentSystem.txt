@@ -1,0 +1,940 @@
+#include <iostream>
+#include <fstream> // header file for file handling
+#include <string>
+#include <cstring>
+using namespace std;
+void drawline(int,char); // function for draw lines
+void counter_and_CollectM(); // function for count Morning students
+void counter_and_CollectE(); // function for count Evening students
+//////////////////////////////////////////////////////////////////////
+int checker = 0;
+int count_Female_teacher = 0; //global variable for count female teacher
+int count_Male_teacher = 0; // global variable for count male teacher
+int count_student = 0; // global variable for count student
+string na[30][5]; // 2D array for store Student information 
+string ta[30][2]; // 2D array for store teacher information
+/////////////////////////////////////////////////////////////////
+void School_mana()
+{
+	cout << "\n\n\t\t\t\t=======================================" << endl;
+	cout << "\t\t\t\t|||   School Management System      |||" << endl;
+	cout << "\t\t\t\t=======================================" << endl<<endl;
+}
+//////////////////////////////////////////////////////////////////
+class subjects // class for subjects
+{
+public:
+	int engish;
+	int urdu;
+	int math;
+	int Pak_study;
+	int computer;
+	int I_S;
+public:
+	void input_Marks(ofstream &s)  // Input function for entring marks
+	{
+		cout << "Enter Marks for English : ";
+		cin >> engish;
+		cout << "Enter Marks for Urdu : ";
+		cin >> urdu;
+		cout << "Enter Marks for Math : ";
+		cin >> math;
+		cout << "Enter Marks for Pakistan Studies : ";
+		cin >> Pak_study;
+		cout << "Enter Marks for Computer Science : ";
+		cin >> computer;
+		cout << "Enter Marks for Islamic Studies : ";
+		cin >> I_S;
+		s << engish << endl<<urdu<<endl<<math<<endl<<Pak_study<<endl<<computer<<endl<<I_S<<endl;
+	}
+	void Display_marks()
+	{
+		cout << "English ...........    " << engish << endl<<endl;
+		cout << "Urdu ............   " << urdu << endl<<endl;
+		cout << "Math ...............  " << math << endl<<endl;
+		cout << "Pakistan Studies ........  " << Pak_study << endl<<endl;
+		cout << "Computer science ..........  " << computer << endl<<endl;
+		cout << "Islamic Studies ...........  " << I_S << endl<<endl;
+	}
+};
+////////////////////////////////////////////////////////////
+class School // parent class
+{
+protected: // protected data members
+	int Id;
+	string first_name;
+	string last_name;
+public:
+	//pure vitual functions
+	virtual void Input() = 0;
+	virtual void display() = 0;
+}; // end student class
+
+////////////////////////////////////////////////////////////////
+class Student :public School // Derived class from school
+{
+protected:
+	string Registration;
+	string classes;
+public:
+	virtual void Input()=0; // Function for Input values
+    virtual void display() = 0; // function for dislay values
+	virtual void Student_profile() = 0;
+};
+//////////////////////////////////////////////////////////////////
+class Evening_student: public Student
+{
+public:
+	void Input() // Function for Input values
+	{
+		ofstream f("Evening_student.txt", ios::app);
+		cout << "Enter Student ID : ";
+		cin >> Id;
+		cout << "Enter First Name : ";
+		cin >> first_name;
+		cout << "Enter Last Name : ";
+		cin >> last_name;
+		cout << "Registration No. : ";
+		cin >> Registration;
+		cout << "Class : ";
+		cin >> classes;
+		f << Id << endl;
+		f << first_name << endl;
+		f << last_name << endl;
+		f << Registration << endl;
+		f << classes << endl;
+		f.close();
+	}
+	void display() // function for dislay values
+	{
+		ifstream f("Evening_student.txt");
+		while (!f.eof())
+		{
+			f >> Id;
+			cout << Id << "\t";
+			f.ignore();
+			getline(f, first_name);
+			cout << first_name << "\t\t";
+			getline(f, last_name);
+			cout << last_name << "\t\t";
+			getline(f, Registration);
+			cout << Registration << "\t\t\t";
+			getline(f, classes);
+			cout << classes << endl << endl;
+		}
+		f.close();
+	}
+	void Student_profile()
+	{
+		subjects se;
+		system("cls");
+		string name;
+		string regis;
+		School_mana();
+		counter_and_CollectE();
+		cout << "LogIn To Your Account......." << endl << endl;
+		cout << "Enter Your (UserName)First Name : ";
+		cin >> name;
+		cout << "Enter Your Registration No : ";
+		cin >> regis;
+		for (int i = 0; i < count_student; i++)
+		{
+			if (name == na[i][1] && regis == na[i][3])
+			{
+				ifstream f("Marksheet.txt");
+				while (!f.eof())
+				{
+					getline(f, Registration);
+					getline(f, first_name);
+					if (name == first_name&&regis == Registration)
+					{
+						system("cls");
+						cout << "\n=========================================" << endl<<endl;
+						cout << "First Name  : " << na[i][1] << endl;
+						cout << "Last Name  : " << na[i][2] << endl;
+						cout << "Registration No  : " << na[i][3] << endl;
+						cout << "Class  : " << na[i][4] << endl;
+						cout << "\n\n=========================================" << endl;
+						cout << "=========================================" << endl << endl;
+						f >> se.engish;
+						f >> se.urdu;
+						f >> se.math;
+						f >> se.Pak_study;
+						f >> se.computer;
+						f >> se.I_S;
+						se.Display_marks();
+						int sum = se.engish + se.computer + se.I_S + se.math + se.Pak_study +se.urdu;
+						cout << "Total Marks  .............    " << sum << " / 600 " << endl<<endl;
+						double avg = float((sum * 100) / 600);
+						cout << "Average ................. " << avg <<"%"<< endl<<endl;
+						checker = 0;
+					}
+				}
+				f.close();
+			}
+			else
+			{
+				checker = 1;
+			}
+		}
+		if (checker == 1)
+		{
+			cout << "\nLogin Failed Please Enter Valid Username Or Registration No.!! ........" << endl<<endl;
+		}
+	}
+	bool operator==(Evening_student &e)
+	{
+		if (first_name == e.first_name&&last_name == e.last_name)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+//////////////////////////////////////////////////////////////////////////////////////
+class Morning_student :public Student
+{
+public:
+	void Input() // Function for Input values
+	{
+		ofstream f("Morning_student.txt", ios::app);
+		cout << "Enter Student ID : ";
+		cin >> Id;
+		cout << "Enter First Name : ";
+		cin >> first_name;
+		cout << "Enter Last Name : ";
+		cin >> last_name;
+		cout << "Registration No. : ";
+		cin >> Registration;
+		cout << "Class : ";
+		cin >> classes;
+		f << Id << endl;
+		f << first_name << endl;
+		f << last_name << endl;
+		f << Registration << endl;
+		f << classes << endl;
+		f.close();
+	}
+	void display() // function for dislay values
+	{
+		ifstream f("Morning_student.txt");
+		while (!f.eof())
+		{
+			f >> Id;
+			cout << Id << "\t";
+			f.ignore();
+			getline(f, first_name);
+			cout << first_name << "\t\t";
+			getline(f, last_name);
+			cout << last_name << "\t\t";
+			getline(f, Registration);
+			cout << Registration << "\t\t\t";
+			getline(f, classes);
+			cout << classes << endl << endl;
+		}
+		f.close();
+	}
+	void Student_profile()
+	{
+		subjects se;
+		system("cls");
+		string name;
+		string regis;
+		School_mana();
+		counter_and_CollectM();
+		cout << "LogIn To Your Account......." << endl << endl;
+		cout << "Enter Your (UserName) First Name : ";
+		cin >> name;
+		cout << "Enter Your Registration No : ";
+		cin >> regis;
+		for (int i = 0; i < count_student; i++)
+		{
+			if (name == na[i][1] && regis == na[i][3])
+			{
+				ifstream f("Marksheet.txt");
+				while (!f.eof())
+				{
+					getline(f, Registration);
+					getline(f, first_name);
+					if (name == first_name&&regis == Registration)
+					{
+						system("cls");
+						cout << "\n=========================================" << endl << endl;
+						cout << "First Name  : " << na[i][1] << endl;
+						cout << "Last Name  : " << na[i][2] << endl;
+						cout << "Registration No  : " << na[i][3] << endl;
+						cout << "Class  : " << na[i][4] << endl;
+						cout << "\n\n=========================================" << endl;
+						cout << "=========================================" << endl << endl;
+						f >> se.engish;
+						f >> se.urdu;
+						f >> se.math;
+						f >> se.Pak_study;
+						f >> se.computer;
+						f >> se.I_S;
+						se.Display_marks();
+						int sum = se.engish + se.computer + se.I_S + se.math + se.Pak_study + se.urdu;
+						cout << "Total Marks  .............    " << sum << " / 600 " << endl << endl;
+						double avg = float((sum * 100) / 600);
+						cout << "Average ................. " << avg <<"%"<< endl << endl;
+						checker = 0;
+					}
+				}
+				f.close();
+			}
+			else
+			{
+				checker = 1;
+			}
+		}
+		if (checker == 1)
+		{
+			cout << "\nLogin Failed Please Enter Valid Username Or Registration No.!! ........" << endl<<endl;
+		}
+	}
+	bool operator==(Morning_student &m)
+	{
+		if (first_name == m.first_name&&last_name == m.last_name)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+////////////////////////////////////////////////////////////////////////
+class Teacher :public School // drive class of school
+{
+protected:
+	string qualification;
+	string exp;
+	string subj;
+	string serves;
+	subjects ss;
+public:
+	//pure virtual functions
+	virtual void Input() = 0; // Function for Input values
+	virtual void display() = 0; //function for display values
+	virtual void Enter_marks() = 0; // function for enter Marks of student
+};
+////////////////////////////////////////////////////////////////////////////
+class Male_teacher:public Teacher // derived class from Teacher
+{
+private:
+	int pay;
+public:
+	void Input() // Function for Input values
+	{
+		ofstream f1("Male_Teacher.txt", ios::app); // Open and write Append file for Teacher data
+		cout << "Enter Teacher ID : ";
+		cin >> Id;
+		cout << "Enter First Name : ";
+		cin >> first_name;
+		cout << "Enter Last Name : ";
+		cin >> last_name;
+		cout << "Enter Qualification : ";
+		cin >> qualification;
+		cout << "Enter Experience : ";
+		cin >> exp;
+		cout << "Enter Pay : ";
+		cin >> pay;
+		cout << "Enter Subject teach : ";
+		cin >> subj;
+		cout << "Enter No. of serves in school : ";
+		cin >> serves;
+		f1 << Id << endl;
+		f1 << first_name << endl;
+		f1 << last_name << endl;
+		f1 << qualification << endl;
+		f1 << exp << endl;
+		f1 << pay << endl;
+		f1 << subj << endl;
+		f1 << serves << endl;
+		f1.close();
+	}
+	void display() //function for display values
+	{
+		ifstream f("Male_Teacher.txt"); // for open and read file
+		while (!f.eof())
+		{
+			f >> Id;
+			cout << Id << "\t";
+			f.ignore();
+			getline(f, first_name);
+			cout << first_name << "\t\t";
+			getline(f, last_name);
+			cout << last_name << "\t\t";
+			getline(f, qualification);
+			cout << qualification << "\t\t";
+			getline(f, exp);
+			cout << exp << "\t\t";
+			f >> pay;
+			cout << pay << "\t\t";
+			f.ignore();
+			getline(f, subj);
+			cout << subj << "\t\t";
+			getline(f, serves);
+			cout << serves << endl << endl;
+		}
+		f.close();
+	}
+	void Enter_marks() // function for enter Marks of student
+	{
+		checker = 1;
+		string fistname;
+		string lstname;
+		char choice;
+		counter_Male();
+		cout << "Login To Your Account......" << endl<<endl;
+		cout << "Enter First Name : ";
+		cin >> fistname;
+		cout << "Enter Last Name : ";
+		cin >> lstname;
+		for (int i = 0; i < count_Male_teacher; i++)
+		{
+			if (fistname == ta[i][0] && lstname == ta[i][1])
+			{
+				cout << "Enter Marks for (M) Morning And (E) Evening.... : ";
+				cin >> choice;
+				if (choice == 'M' || choice == 'm')
+				{
+					Student *s1 = new Morning_student;
+					counter_and_CollectM();
+					cout << "Total Students : " << count_student << endl;
+					ofstream s("Marksheet.txt", ios::app);
+					for (int i = 0; i < count_student; i++)
+					{
+						cout << "Enter Marks for  " << na[i][1] << "  " << na[i][2] << "  " << na[i][3] << endl;
+						s << na[i][3] << endl << na[i][1] << endl;
+						ss.input_Marks(s);
+					}
+					checker = 0;
+					s.close();
+				}
+				else if (choice == 'E' || choice == 'e')
+				{
+					Student *s2 = new Evening_student;
+					counter_and_CollectE();
+					cout << "Total Students : " << count_student << endl;
+					ofstream s("Marksheet.txt", ios::app);
+					for (int i = 0; i < count_student; i++)
+					{
+						cout << "Enter Marks for  " << na[i][1] << "  " << na[i][2] << "  " << na[i][3] << endl;
+						s << na[i][3] << endl << na[i][1] << endl;
+						ss.input_Marks(s);
+					}
+					checker = 0;
+					s.close();
+				}
+				else
+				{
+					checker = 1;
+				}
+			}
+		}
+		if (checker == 1)
+		{
+			cout << "\nLogin Failed Please Enter Valid First Name Or Last name!! ........" << endl << endl;
+		}
+	}
+	void counter_Male() // count Male teacher
+	{
+		int i=0;
+		ifstream f("Male_Teacher.txt");
+		while (!f.eof())
+		{
+			f >> Id;
+			f.ignore();
+			getline(f, first_name);
+			ta[i][0] = first_name;
+			getline(f, last_name);
+			ta[i][1] = last_name;
+			getline(f, qualification);
+			getline(f, exp);
+			f >> pay;
+			f.ignore();
+			getline(f, subj);
+			getline(f, serves);
+			i++;
+		}
+		f.close();
+		count_Male_teacher = i - 1;
+	}
+	bool operator>=(Male_teacher &tm)
+	{
+		if (pay >= tm.pay&&exp >= tm.exp)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+//////////////////////////////////////////////////////////////////
+class Female_teacher:public Teacher // derived class from Teacher
+{
+private:
+	int pay;
+public:
+	void Input() // Function for Input values
+	{
+		ofstream f1("Female_Teacher.txt", ios::app); // Open and write Append file for Teacher data
+		cout << "Enter Teacher ID : ";
+		cin >> Id;
+		cout << "Enter First Name : ";
+		cin >> first_name;
+		cout << "Enter Last Name : ";
+		cin >> last_name;
+		cout << "Enter Qualification : ";
+		cin >> qualification;
+		cout << "Enter Experience : ";
+		cin >> exp;
+		cout << "Enter Pay : ";
+		cin >> pay;
+		cout << "Enter Subject teach : ";
+		cin >> subj;
+		cout << "Enter No. of serves in school : ";
+		cin >> serves;
+		f1 << Id << endl;
+		f1 << first_name << endl;
+		f1 << last_name << endl;
+		f1 << qualification << endl;
+		f1 << exp << endl;
+		f1 << pay << endl;
+		f1 << subj << endl;
+		f1<< serves << endl;
+		f1.close();
+	}
+	void display()  //function for display values
+	{
+		ifstream f("Female_Teacher.txt");
+		while (!f.eof())
+		{
+			f >> Id;
+			cout << Id << "\t";
+			f.ignore();
+			getline(f, first_name);
+			cout << first_name << "\t\t";
+			getline(f, last_name);
+			cout << last_name << "\t\t";
+			getline(f, qualification);
+			cout << qualification << "\t\t";
+			getline(f, exp);
+			cout << exp << "\t\t";
+			f >> pay;
+			cout << pay << "\t\t";
+			f.ignore();
+			getline(f, subj);
+			cout << subj << "\t\t";
+			getline(f, serves);
+			cout << serves << endl << endl;
+		}
+		f.close();
+	}
+	void Enter_marks() // function for enter Marks of student
+	{
+		checker = 1;
+		char choice;
+		string fistname;
+		string lstname;
+		counter_female();
+		cout << "Enter First Name : ";
+		cin >> fistname;
+		cout << "Enter Last Name : ";
+		cin >> lstname;
+		for (int i = 0; i < count_Female_teacher; i++)
+		{
+			if (fistname == ta[i][0] && lstname == ta[i][1])
+			{
+				cout << "Enter Marks for (M) Morning And (E) Evening.... : ";
+				cin >> choice;
+				if (choice == 'M' || choice == 'm')
+				{
+					Student *s1 = new Morning_student;
+					counter_and_CollectM();
+					cout << "Total Students : " << count_student << endl;
+					ofstream s("Marksheet.txt", ios::app);
+					for (int i = 0; i < count_student; i++)
+					{
+						cout << "Enter Marks for  " << na[i][1] << "  " << na[i][2] << "  " << na[i][3] << endl;
+						s << na[i][1] << endl << na[i][3] << endl;
+						ss.input_Marks(s);
+					}
+					checker = 0;
+					s.close();
+				}
+				else if (choice == 'E' || choice == 'e')
+				{
+					Student *s2 = new Evening_student;
+					counter_and_CollectE();
+					cout << "Total Students : " << count_student << endl;
+					ofstream s("Marksheet.txt", ios::app);
+					for (int i = 0; i < count_student; i++)
+					{
+						cout << "Enter Marks for  " << na[i][1] << "  " << na[i][2] << "  " << na[i][3] << endl;
+						s << na[i][1] << endl << na[i][3] << endl;
+						ss.input_Marks(s);
+					}
+					checker = 0;
+					s.close();
+				}
+				else
+				{
+					checker = 1;
+				}
+			}
+		}
+		if (checker == 1)
+		{
+			cout << "\nLogin Failed Please Enter Valid First Name Or Last Name.!! ........" << endl << endl;
+		}
+	}
+	void counter_female() // count Male teacher
+	{
+		int i = 0;
+		ifstream f("Female_Teacher.txt");
+		while (!f.eof())
+		{
+			f >> Id;
+			f.ignore();
+			getline(f, first_name);
+			ta[i][0] = first_name;
+			getline(f, last_name);
+			ta[i][1] = last_name;
+			getline(f, qualification);
+			getline(f, exp);
+			f >> pay;
+			f.ignore();
+			getline(f, subj);
+			getline(f, serves);
+			i++;
+		}
+		f.close();
+		count_Female_teacher = i - 1;
+	}
+	bool operator>=(Female_teacher &tf)
+	{
+		if (pay >= tf.pay&&exp >= tf.exp)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+/////////////////////////////////////////////////////////////////////
+class Admin :public School // derived class from School
+{
+
+public:
+	void Input() // Function for Input values
+	{
+		int n;
+		cout << "1. Teacher " << endl;
+		cout << "2. Student " << endl << endl;
+		cout << "Enter Your Choice : ";
+		cin >> n;
+		if (n == 1)
+		{
+			char choice;
+			cout << "Enter (M) for Male and (F) for Female : ";
+			cin >> choice;
+			if (choice == 'M' || choice == 'm')
+			{
+				Teacher *tm = new Male_teacher; // Creating dynamic memory
+				tm->Input();
+			}
+			else if (choice == 'F' || choice == 'f')
+			{
+				Teacher *tf = new Female_teacher; // Creating dynamic memory
+				tf->Input();
+			}
+		}
+		else if (n == 2)
+		{
+			char choice;
+			cout << "Enter (E) for Evining and (M) for Morning... : ";
+			cin >> choice;
+			if (choice == 'M' || choice == 'm')
+			{
+				Student *s = new Morning_student;
+				{
+					s->Input();
+				}
+			}
+			else if (choice == 'E' || choice == 'e')
+			{
+				Student *s = new Evening_student;
+				{
+
+					s->Input();
+				}
+			}
+		}
+		else
+		{
+			cout << "\n\n Wrong Input..........." << endl;
+		}
+	}
+	void display() //function for display values
+	{
+		int n;
+		cout << "1. Teacher " << endl;
+		cout << "2. Student " << endl<<endl;
+		cout << "Enter Your Choice : ";
+		cin >> n;
+		if (n == 1)
+		{
+			system("cls");
+			char choice;
+			cout << "For Reading Data ........" << endl << endl;
+			cout << "Enter (M) for Male and (F) for Female : ";
+			cin >> choice;
+			system("cls");
+			cout << endl << endl;
+			drawline(110, '=');
+			cout << "ID     First Name     Last Name     Qualification     Pay         Experience      Subject        serves" << endl;
+			drawline(110, '=');
+			cout << endl << endl;
+			if (choice == 'M' || choice == 'm')
+			{
+				Teacher *tm = new Male_teacher;
+				tm->display();
+			}
+			else if (choice == 'F' || choice == 'f')
+			{
+				Teacher *tf = new Female_teacher;
+				tf->display();
+			}
+		}
+		else if (n == 2)
+		{
+			system("cls");
+			char choice;
+			cout << "Enter (M) morning and (E) Evening... : ";
+			cin >> choice;
+			system("cls");
+			cout << endl << endl;
+			drawline(70, '=');
+			cout << "ID\tFirst Name\tLast Name\tRegistration No\t\tClass" << endl;
+			drawline(70, '=');
+			cout << endl;
+			if (choice == 'M' || choice == 'm')
+			{
+				Student *s = new Morning_student;
+				s->display();
+			}
+			else if (choice == 'E' || choice == 'e')
+			{
+				Student *s = new Evening_student;
+				s->display();
+			}
+		}
+		else
+		{
+			cout << "\n\n Wrong Input..........." << endl;
+		}
+	}
+};
+////////////////////////////////////////////////////////////////////
+void main()
+{
+	system("cls");
+	char choice = 'y';
+	int n1;
+	ofstream f;
+	ifstream f1;
+	School_mana();
+	cout << "\n\n\n\t\t\t\tClass & Section ................   BS(IT)-3B" << endl<<endl;
+	cout << "\t\t\t\tGroup Members\t\tEnrollment" << endl;
+	drawline(120, '.');
+	cout << "\n\t\t\t\t~ Muhammad Fahad\t01-235162-029\t\tGroup Leader" << endl;
+	cout << "\t\t\t\t~ Hassan Ali Mirza\t01-235162-078" << endl;
+	cout << "\t\t\t\t~ Sana Noreen\t\t01-235162-038" << endl;
+	cout << "\t\t\t\t~ Shoaib Sultan\t\t01-235162-069" << endl<<endl;
+	drawline(120, '.');
+	cout << endl << endl << endl;
+	system("pause");
+	while (choice == 'y' || choice == 'Y')
+	{
+		system("cls");
+		School_mana();
+		cout << "\n\n\t\t\t\t1. Administration" << endl;
+		cout << "\t\t\t\t2. Teacher Profile" << endl;
+		cout << "\t\t\t\t3. Student Profile" << endl;
+		cout << "\t\t\t\t0. Exit" << endl<<endl;
+		cout << "Enter Choice : ";
+		cin >> n1;
+		if (n1 == 0)
+		{
+			break;
+		}
+		switch (n1)
+		{
+		case 1:
+		{
+			system("cls");
+			School_mana();
+			School *s = new Admin; // dynamic memory for Admin
+			cout << "\n\n\t\t\t1. Input For Teacher/Student" << endl;
+			cout << "\t\t\t2. Read Data For Teacher/Student" << endl;
+			cout << "\t\t\t0. Main Menu" << endl;
+			cout << "Enter your choice : ";
+			cin >> n1;
+			if (n1 == 1)
+			{
+				system("cls");
+				School_mana();
+				s->Input(); // calling of input function
+			}
+			else if (n1 == 2)
+			{
+				system("cls");
+				School_mana();
+				s->display(); // calling of display function
+			}
+			else if (n1 == 0)
+			{
+				main();
+			}
+			else
+			{
+				cout << "\n\nWrong Input.........." << endl;
+			}
+			break;
+		}
+		case 2: 
+		{
+			system("cls");
+			School_mana();
+			cout << "\n\n\t\t\t1. Male Staff" << endl;
+			cout << "\t\t\t2. Female Staff" << endl;
+			cout << "\t\t\t0. Main Menu" << endl;
+			cout << "Enter your choice : ";
+			cin >> n1;
+			
+			if (n1 == 1)
+			{
+				Teacher *t =new Male_teacher;
+				while (choice == 'y' || choice == 'Y')
+				{
+					system("cls");
+					School_mana();
+					t->Enter_marks();
+					cout << "For Add more (Y) and Not (N)......";
+					cin >> choice;
+				}
+			}
+			else if (n1 == 2)
+			{
+				Teacher *t = new Female_teacher;
+				while (choice == 'y' || choice == 'Y')
+				{
+					system("cls");
+					School_mana();
+					t->Enter_marks();
+					cout << "For Add more (Y) and Not (N)......";
+					cin >> choice;
+				}
+			}
+			else if (n1 == 0)
+			{
+				main();
+			}
+			break;
+		}
+		case 3:
+		{
+			system("cls");
+			School_mana();
+			cout << "Morning Student (M).... Evening (E)...... ";
+			cin >> choice;
+			if (choice == 'M' || choice == 'm')
+			{
+				system("cls");
+				School_mana();
+				Student *sss = new Morning_student;
+				sss->Student_profile();
+			}
+			else if (choice == 'E' || choice == 'e')
+			{
+				system("cls");
+				School_mana();
+				Student *sss = new Evening_student;
+				sss->Student_profile();
+			}
+			break;
+		}
+		}
+		cout << "For countinue (Y) and Not (N)......";
+		cin >> choice;
+	}
+}// end main
+/////////////////////////////////////////////////////////////////////////
+void drawline(int a,char c) // definig of function
+{
+	for (int i = 0; i < a; i++)
+	{
+		cout << c;
+	}
+	cout << endl;
+}
+///////////////////////////////////////////////////////////////////////
+void counter_and_CollectM() // function for counting studnt
+{
+	int i = 0;
+	int id;
+	string line;
+	ifstream f("Morning_student.txt");
+	while (!f.eof())
+	{
+		f >> id;
+		f.ignore();
+		na[i][0] = id;
+		getline(f, line);
+		na[i][1] = line;
+		getline(f, line);
+		na[i][2] = line;
+		getline(f, line);
+		na[i][3] = line;
+		getline(f, line);
+		na[i][4] = line;
+		i++;
+	}
+	f.close();
+	count_student = i - 1;
+}
+////////////////////////////////////////////////////////////////////
+void counter_and_CollectE() // function for counting studnt
+{
+	int i = 0;
+	int id;
+	string line;
+	ifstream f("Evening_student.txt");
+	while (!f.eof())
+	{
+		f >> id;
+		f.ignore();
+		na[i][0] = id;
+		getline(f, line);
+		na[i][1] = line;
+		getline(f, line);
+		na[i][2] = line;
+		getline(f, line);
+		na[i][3] = line;
+		getline(f, line);
+		na[i][4] = line;
+		i++;
+	}
+	f.close();
+	count_student = i - 1;
+}
